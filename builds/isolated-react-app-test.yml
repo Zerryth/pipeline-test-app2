@@ -18,7 +18,7 @@ stages:
               displayName: Cache npm
               inputs:
                 key: 'test-pipeline-cache-yarnlock2 | npm | "$(Agent.OS)" | $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/yarn.lock'
-                path: $(System.DefaultWorkingDirectory)/node_modules
+                path: $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/node_modules
                 cacheHitVar: 'CacheRestored'
             
             - powershell: yarn install
