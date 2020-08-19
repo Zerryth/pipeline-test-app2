@@ -1,0 +1,48 @@
+# Ensure BotFramework-Streaming library works in the browser 
+# by running tests after deploying a streaming-enabled JS Echo Bot 
+# and a React App that uses latest streaming bits in DLJS and WebChat.
+
+name: $(Build.BuildId)
+trigger: none
+pr: none
+
+pool:
+  vmImage: 'windows-2019'
+
+stages:
+  - stage: Create_And_Deploy_Projects
+    jobs:
+        - job: Start_React_App_And_Run_Tests
+          steps:
+            - task: Cache@2
+              displayName: Cache npm
+              inputs:
+                key: 'test-pipeline-cache-yarnlock2 | npm | "$(Agent.OS)" | $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/yarn.lock'
+                path: $(System.DefaultWorkingDirectory)/node_modules
+                cacheHitVar: 'CacheRestored'
+            
+            - powershell: yarn install
+              displayName: 'yarn install react-app'
+              condition: ne(variables.CacheRestored, 'true')
+              workingDirectory: $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock
+
+            - powershell: yarn install
+              displayName: 'yarn install tests'
+              condition: ne(variables.CacheRestored, 'true')
+              workingDirectory: $(System.DefaultWorkingDirectory)/tests
+            
+            - powershell: ls $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/node_modules/
+              displayName: ls react-app/node_modules/
+              
+            - powershell: start powershell {yarn start}
+              displayName: 'npm start React App'
+              workingDirectory: $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock
+            
+            - powershell: Start-Sleep -Seconds 60
+              displayName: 'Sleeping for 60 seconds to allow React App to serve...'
+            
+            - powershell: npm test
+              displayName: 'npm test'
+              workingDirectory: $(System.DefaultWorkingDirectory)/tests
+
+          
