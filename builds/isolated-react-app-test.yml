@@ -12,7 +12,7 @@ pool:
 stages:
   - stage: Create_And_Deploy_Projects
     jobs:
-        - job: Start_React_App_And_Run_Tests
+        - job: Prep_React_App
           steps:
             - task: Cache@2
               displayName: Cache npm
@@ -25,14 +25,27 @@ stages:
               displayName: 'yarn install react-app'
               condition: ne(variables.CacheRestored, 'true')
               workingDirectory: $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock
+            
+            - task: PublishPipelineArtifact@1
+              displayName: 'Publish Artifact: CustomizedReactApp'
+              inputs:
+                targetPath: $(ReactProjectDir)
+                artifactName: 'CustomizedReactApp2'
 
+        - job: Run_Tests
+          steps:
             - powershell: yarn install
               displayName: 'yarn install tests'
               condition: ne(variables.CacheRestored, 'true')
               workingDirectory: $(System.DefaultWorkingDirectory)/tests
             
+            - task: DownloadPipelineArtifact@2
+              inputs:
+                artifact: ReactApp
+                path: $(ReactProjectDir)
+            
             - powershell: ls $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/node_modules/
-              displayName: ls react-app/node_modules/
+              displayName: View react-app/node_modules/
               
             - powershell: start powershell {yarn start}
               displayName: 'npm start React App'
