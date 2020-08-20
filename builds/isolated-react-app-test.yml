@@ -33,6 +33,8 @@ stages:
                 artifactName: 'CustomizedReactApp2'
 
         - job: Run_Tests
+          dependsOn: Prep_React_App
+          condition: succeeded()
           steps:
             - powershell: yarn install
               displayName: 'yarn install tests'
