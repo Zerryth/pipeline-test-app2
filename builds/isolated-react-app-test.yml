@@ -33,7 +33,7 @@ stages:
               displayName: 'Publish Artifact: CustomizedReactApp'
               inputs:
                 targetPath: $(ReactProjectDir)
-                artifactName: 'CustomizedReactApp2'
+                artifactName: 'CustomizedReactApp'
 
         - job: Run_Tests
           dependsOn: Prep_React_App
@@ -46,7 +46,7 @@ stages:
             
             - task: DownloadPipelineArtifact@2
               inputs:
-                artifact: ReactApp
+                artifact: CustomizedReactApp
                 path: $(ReactProjectDir)
             
             - powershell: ls $(ReactProjectDir)/node_modules/
