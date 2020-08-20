@@ -9,6 +9,9 @@ pr: none
 pool:
   vmImage: 'windows-2019'
 
+variables:
+  ReactProjectDir: $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock
+
 stages:
   - stage: Create_And_Deploy_Projects
     jobs:
@@ -18,13 +21,13 @@ stages:
               displayName: Cache npm
               inputs:
                 key: 'test-pipeline-cache-yarnlock2 | npm | "$(Agent.OS)" | $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/yarn.lock'
-                path: $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/node_modules
+                path: $(ReactProjectDir)/node_modules
                 cacheHitVar: 'CacheRestored'
             
             - powershell: yarn install
               displayName: 'yarn install react-app'
               condition: ne(variables.CacheRestored, 'true')
-              workingDirectory: $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock
+              workingDirectory: $(ReactProjectDir)
             
             - task: PublishPipelineArtifact@1
               displayName: 'Publish Artifact: CustomizedReactApp'
@@ -46,12 +49,12 @@ stages:
                 artifact: ReactApp
                 path: $(ReactProjectDir)
             
-            - powershell: ls $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/node_modules/
+            - powershell: ls $(ReactProjectDir)/node_modules/
               displayName: View react-app/node_modules/
               
             - powershell: start powershell {yarn start}
               displayName: 'npm start React App'
-              workingDirectory: $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock
+              workingDirectory: $(ReactProjectDir)
             
             - powershell: Start-Sleep -Seconds 60
               displayName: 'Sleeping for 60 seconds to allow React App to serve...'
