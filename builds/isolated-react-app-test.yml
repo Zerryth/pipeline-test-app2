@@ -39,6 +39,8 @@ stages:
         - job: Run_Tests
           dependsOn: Prep_React_App
           condition: succeeded()
+          variables:
+            PORT: 3009
           steps:
             - powershell: yarn install
               displayName: 'yarn install tests'
