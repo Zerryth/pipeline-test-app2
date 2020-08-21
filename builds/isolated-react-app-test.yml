@@ -29,6 +29,10 @@ stages:
             - powershell: Remove-Item src/App.js, src/index.js, public/index.html, ./package.json, ./yarn.lock
               displayName: "Delete files we're replacing with custom code in react-app"
               workingDirectory: $(ReactProjectDir)
+            
+            - powershell: ls ..
+              workingDirectory: $(ReactProjectDir)
+              displayName: 'ls .. from $(ReactProjectDir)'
 
             - powershell: |
                 copy ../custom-app-code/App.js, ../custom-app-code/index.js ./src/
@@ -37,50 +41,50 @@ stages:
               displayName: 'Copy custom files into react-app'
               workingDirectory: $(ReactProjectDir)
             
-            # Install Dependencies 
-            - task: Cache@2
-              displayName: Cache npm
-              inputs:
-                key: 'test-pipeline-cache-from-scratch | npm | "$(Agent.OS)" | $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/yarn.lock'
-                path: $(ReactProjectDir)/node_modules
-                cacheHitVar: 'CacheRestored'
+        #     # Install Dependencies 
+        #     - task: Cache@2
+        #       displayName: Cache npm
+        #       inputs:
+        #         key: 'test-pipeline-cache-from-scratch | npm | "$(Agent.OS)" | $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock/yarn.lock'
+        #         path: $(ReactProjectDir)/node_modules
+        #         cacheHitVar: 'CacheRestored'
             
-            - powershell: yarn install
-              displayName: 'yarn install react-app'
-              condition: ne(variables.CacheRestored, 'true')
-              workingDirectory: $(ReactProjectDir)
+        #     - powershell: yarn install
+        #       displayName: 'yarn install react-app'
+        #       condition: ne(variables.CacheRestored, 'true')
+        #       workingDirectory: $(ReactProjectDir)
             
-            - task: PublishPipelineArtifact@1
-              displayName: 'Publish Artifact: CustomizedReactApp'
-              inputs:
-                targetPath: $(ReactProjectDir)
-                artifactName: 'CustomizedReactApp'
+        #     - task: PublishPipelineArtifact@1
+        #       displayName: 'Publish Artifact: CustomizedReactApp'
+        #       inputs:
+        #         targetPath: $(ReactProjectDir)
+        #         artifactName: 'CustomizedReactApp'
 
-        - job: Run_Tests
-          dependsOn: Prep_React_App
-          condition: succeeded()
-          variables:
-            PORT: 3000
-          steps:
-            - powershell: yarn install
-              displayName: 'yarn install tests'
-              condition: ne(variables.CacheRestored, 'true')
-              workingDirectory: $(System.DefaultWorkingDirectory)/tests
+        # - job: Run_Tests
+        #   dependsOn: Prep_React_App
+        #   condition: succeeded()
+        #   variables:
+        #     PORT: 3000
+        #   steps:
+        #     - powershell: yarn install
+        #       displayName: 'yarn install tests'
+        #       condition: ne(variables.CacheRestored, 'true')
+        #       workingDirectory: $(System.DefaultWorkingDirectory)/tests
             
-            - task: DownloadPipelineArtifact@2
-              inputs:
-                artifact: CustomizedReactApp
-                path: $(ReactProjectDir)
+        #     - task: DownloadPipelineArtifact@2
+        #       inputs:
+        #         artifact: CustomizedReactApp
+        #         path: $(ReactProjectDir)
             
-            - powershell: start powershell {npx react-scripts start}
-              displayName: 'npm start React App'
-              workingDirectory: $(ReactProjectDir)
+        #     - powershell: start powershell {npx react-scripts start}
+        #       displayName: 'npm start React App'
+        #       workingDirectory: $(ReactProjectDir)
             
-            - powershell: Start-Sleep -Seconds 60
-              displayName: 'Sleeping for 60 seconds to allow React App to serve...'
+        #     - powershell: Start-Sleep -Seconds 60
+        #       displayName: 'Sleeping for 60 seconds to allow React App to serve...'
             
-            - powershell: npm test
-              displayName: 'npm test'
-              workingDirectory: $(System.DefaultWorkingDirectory)/tests
+        #     - powershell: npm test
+        #       displayName: 'npm test'
+        #       workingDirectory: $(System.DefaultWorkingDirectory)/tests
 
           
