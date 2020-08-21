@@ -1,6 +1,6 @@
-# Ensure BotFramework-Streaming library works in the browser 
-# by running tests after deploying a streaming-enabled JS Echo Bot 
-# and a React App that uses latest streaming bits in DLJS and WebChat.
+# Ensure BotFramework-Streaming library works in the browser by running tests after:
+# - deploying a streaming-enabled JS Echo Bot 
+# - and a React App that uses latest streaming bits in DLJS and WebChat
 
 name: $(Build.BuildId)
 trigger: none
@@ -11,6 +11,7 @@ pool:
 
 variables:
   ReactProjectDir: $(System.DefaultWorkingDirectory)/pipeline2-with-yarnlock
+  runCodesignValidationInjection: false
 
 stages:
   - stage: Create_And_Deploy_Projects
@@ -49,10 +50,7 @@ stages:
                 artifact: CustomizedReactApp
                 path: $(ReactProjectDir)
             
-            - powershell: ls $(ReactProjectDir)/node_modules/
-              displayName: View react-app/node_modules/
-              
-            - powershell: start powershell {yarn start}
+            - powershell: start powershell {npx react-scripts start}
               displayName: 'npm start React App'
               workingDirectory: $(ReactProjectDir)
             
