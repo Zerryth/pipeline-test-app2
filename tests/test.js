@@ -27,9 +27,9 @@ describe('Chrome', function () {
 function createDriver(browser) {
     // For now, we are only using ChromeDriver
     // In future expansions on E2E streaming tests, we can expand to create options for multiple browsers
-    const options = new Options().headless();
+    // const options = new Options().headless();
     const builder = new Builder()
-        .setChromeOptions(options)
+        // .setChromeOptions(options)
         .forBrowser(browser)
         .build();
 
