@@ -52,7 +52,8 @@ stages:
                 artifact: CustomizedReactApp
                 path: $(ReactProjectDir)
             
-            - powershell: start powershell {npx react-scripts start}
+            # - powershell: start powershell {npx react-scripts start}
+            - powershell: npx react-scripts start
               displayName: 'npm start React App'
               workingDirectory: $(ReactProjectDir)
             
